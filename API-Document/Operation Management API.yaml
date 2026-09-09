@@ -1,0 +1,235 @@
+openapi: 3.0.0
+
+info:
+  title: Operation Management API
+  description: |
+    This API allows operation staff to manage customers, drivers,
+    vehicles and trips in the CAB system.
+
+    ### FR10:
+    The system allows operation staff to manage customers, drivers,
+    vehicles and trips.
+
+    Operation staff can monitor trip activities and handle trips
+    that have operational problems.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local server
+
+paths:
+
+  /operations/customers:
+    get:
+      summary: Manage customers
+      operationId: manageCustomers
+      tags:
+        - Operation Management
+
+      security:
+        - bearerAuth: []
+
+      responses:
+        '200':
+          description: Customer management information
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+
+        '403':
+          description: Operation staff does not have permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /operations/drivers:
+    get:
+      summary: Manage drivers
+      operationId: manageDrivers
+      tags:
+        - Operation Management
+
+      security:
+        - bearerAuth: []
+
+      responses:
+        '200':
+          description: Driver management information
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Driver'
+
+        '403':
+          description: Operation staff does not have permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /operations/vehicles:
+    get:
+      summary: Manage vehicles
+      operationId: manageVehicles
+      tags:
+        - Operation Management
+
+      security:
+        - bearerAuth: []
+
+      responses:
+        '200':
+          description: Vehicle management information
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vehicle'
+
+        '403':
+          description: Operation staff does not have permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /operations/trips:
+    get:
+      summary: Manage trips
+      operationId: manageTrips
+      tags:
+        - Operation Management
+
+      security:
+        - bearerAuth: []
+
+      responses:
+        '200':
+          description: Trip management information
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Trip'
+
+        '403':
+          description: Operation staff does not have permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    Customer:
+      type: object
+      properties:
+        customerId:
+          type: integer
+          format: int64
+        fullName:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+
+    Driver:
+      type: object
+      properties:
+        driverId:
+          type: integer
+          format: int64
+        fullName:
+          type: string
+        phone:
+          type: string
+        status:
+          type: string
+          enum:
+            - available
+            - unavailable
+
+    Vehicle:
+      type: object
+      properties:
+        vehicleId:
+          type: integer
+          format: int64
+        vehicleType:
+          type: string
+        driverId:
+          type: integer
+          format: int64
+
+    Trip:
+      type: object
+      properties:
+        tripId:
+          type: integer
+          format: int64
+        customerId:
+          type: integer
+          format: int64
+        driverId:
+          type: integer
+          format: int64
+        pickupLocation:
+          type: string
+        destination:
+          type: string
+        status:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
