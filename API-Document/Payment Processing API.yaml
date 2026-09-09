@@ -1,0 +1,139 @@
+openapi: 3.0.0
+
+info:
+  title: Payment Processing API
+  description: |
+    This API allows the CAB system to calculate the fare and process
+    payment after a trip is completed.
+
+    ### FR08:
+    The system allows fare calculation and payment processing.
+
+    The system supports cash payment and electronic payment through
+    an external payment provider.
+
+    CAB does not directly store sensitive card or payment account
+    information.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local server
+
+paths:
+  /trips/{tripId}/payment:
+    post:
+      summary: Calculate fare and process payment
+      operationId: processPayment
+      tags:
+        - Payment Processing
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - name: tripId
+          in: path
+          required: true
+          description: ID of the completed trip
+          schema:
+            type: integer
+            format: int64
+
+      requestBody:
+        description: Payment method selected by the customer
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+
+      responses:
+        '200':
+          description: Payment processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+
+        '400':
+          description: Invalid payment request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        '402':
+          description: Electronic payment failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        '404':
+          description: Trip not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    PaymentRequest:
+      type: object
+      properties:
+        paymentMethod:
+          type: string
+          enum:
+            - cash
+            - electronic
+      required:
+        - paymentMethod
+
+    PaymentResponse:
+      type: object
+      properties:
+        paymentId:
+          type: integer
+          format: int64
+        tripId:
+          type: integer
+          format: int64
+        amount:
+          type: number
+          format: double
+        paymentMethod:
+          type: string
+          enum:
+            - cash
+            - electronic
+        paymentStatus:
+          type: string
+          enum:
+            - pending
+            - successful
+            - failed
+        message:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
