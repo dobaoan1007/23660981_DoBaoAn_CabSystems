@@ -1,0 +1,119 @@
+openapi: 3.0.0
+
+info:
+  title: Driver Reassignment API
+  description: |
+    This API allows the CAB system to continue finding another suitable
+    driver when the current driver rejects the ride request or does not
+    respond.
+
+    ### FR06:
+    The system continues finding another driver if the driver rejects
+    or does not respond.
+
+    The customer does not need to create the ride request again.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local server
+
+paths:
+  /rides/{rideId}/driver-reassignment:
+    post:
+      summary: Find another driver
+      operationId: reassignDriver
+      tags:
+        - Driver Reassignment
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - name: rideId
+          in: path
+          required: true
+          description: ID of the ride request
+          schema:
+            type: integer
+            format: int64
+
+      requestBody:
+        description: Reason for finding another driver
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReassignmentRequest'
+
+      responses:
+        '200':
+          description: Another driver search has started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReassignmentResponse'
+
+        '404':
+          description: No suitable driver is available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        '400':
+          description: Invalid reassignment request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    ReassignmentRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          enum:
+            - driver_rejected
+            - driver_no_response
+      required:
+        - reason
+
+    ReassignmentResponse:
+      type: object
+      properties:
+        rideId:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+            - searching_driver
+            - driver_found
+            - no_driver_found
+        message:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
