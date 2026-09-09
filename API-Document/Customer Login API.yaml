@@ -1,0 +1,99 @@
+openapi: 3.0.0
+
+info:
+  title: Customer Login API
+  description: |
+    This API allows customers to log in to the CAB system.
+
+    ### FR02:
+    The system allows customers to log in.
+
+    The customer must have an account and provide valid login information
+    before using functions that require authentication.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local server
+
+paths:
+  /customers/login:
+    post:
+      summary: Log in a customer
+      operationId: loginCustomer
+      tags:
+        - Customer Login
+
+      requestBody:
+        description: Customer login information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+
+      responses:
+        '200':
+          description: Customer logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+
+        '400':
+          description: Invalid login information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Customer username
+        password:
+          type: string
+          format: password
+          description: Customer password
+      required:
+        - username
+        - password
+
+    LoginResponse:
+      type: object
+      properties:
+        customerId:
+          type: integer
+          format: int64
+        username:
+          type: string
+        token:
+          type: string
+          description: Authentication token
+
+    Error:
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
