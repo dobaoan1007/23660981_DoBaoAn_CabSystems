@@ -1,0 +1,114 @@
+openapi: 3.0.0
+
+info:
+  title: Ride Notification API
+  description: |
+    This API allows the CAB system to send notifications to customers
+    and drivers during important stages of a ride.
+
+    ### FR09:
+    The system sends notifications to customers and drivers.
+
+    Notifications can be sent when:
+    - A ride request is received.
+    - A driver accepts the ride.
+    - A driver arrives at the pickup location.
+    - The trip is completed.
+    - Payment is successful or failed.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local server
+
+paths:
+  /notifications:
+    post:
+      summary: Send a ride notification
+      operationId: sendRideNotification
+      tags:
+        - Ride Notification
+
+      requestBody:
+        description: Notification information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationRequest'
+
+      responses:
+        '200':
+          description: Notification sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+
+        '400':
+          description: Invalid notification information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        '500':
+          description: Notification service error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+
+    NotificationRequest:
+      type: object
+      properties:
+        recipientId:
+          type: integer
+          format: int64
+          description: ID of the customer or driver receiving the notification
+        recipientType:
+          type: string
+          enum:
+            - customer
+            - driver
+        event:
+          type: string
+          enum:
+            - ride_request_received
+            - driver_assigned
+            - driver_arrived
+            - trip_completed
+            - payment_successful
+            - payment_failed
+        message:
+          type: string
+      required:
+        - recipientId
+        - recipientType
+        - event
+        - message
+
+    NotificationResponse:
+      type: object
+      properties:
+        notificationId:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+            - sent
+            - failed
+        message:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
