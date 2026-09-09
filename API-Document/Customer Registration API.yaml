@@ -1,0 +1,107 @@
+openapi: 3.0.0
+
+info:
+  title: CAB Customer Registration API
+  description: |
+    This API allows customers to register an account in the CAB system.
+
+    ### FR01:
+    The system allows customers to register an account.
+
+    The registration function provides an account for the customer so that
+    the customer can authenticate and use functions that require an account.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local server
+
+paths:
+  /customers/register:
+    post:
+      summary: Register a new customer account
+      operationId: registerCustomer
+      tags:
+        - Customer Registration
+
+      requestBody:
+        description: Customer information used to create a new account
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerRegistration'
+
+      responses:
+        '201':
+          description: Customer account registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+
+        '400':
+          description: Invalid registration information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+
+    CustomerRegistration:
+      type: object
+      properties:
+        fullName:
+          type: string
+          description: Full name of the customer
+        phone:
+          type: string
+          description: Phone number of the customer
+        email:
+          type: string
+          description: Email address of the customer
+        username:
+          type: string
+          description: Username used to access the CAB system
+        password:
+          type: string
+          format: password
+          description: Password used to authenticate the customer
+      required:
+        - fullName
+        - phone
+        - username
+        - password
+
+    Customer:
+      type: object
+      properties:
+        customerId:
+          type: integer
+          format: int64
+          description: Unique ID of the customer
+        fullName:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        username:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
