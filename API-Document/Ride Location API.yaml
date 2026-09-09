@@ -1,0 +1,101 @@
+openapi: 3.0.0
+
+info:
+  title: Ride Location API
+  description: |
+    This API allows customers to provide the pickup location and destination
+    for a ride request.
+
+    ### FR03:
+    The system allows customers to enter pickup and destination locations.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local server
+
+paths:
+  /rides/locations:
+    post:
+      summary: Enter pickup and destination locations
+      operationId: createRideLocation
+      tags:
+        - Ride Location
+
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        description: Pickup and destination information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RideLocation'
+
+      responses:
+        '200':
+          description: Ride locations accepted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RideLocationResponse'
+
+        '400':
+          description: Invalid pickup or destination location
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        '401':
+          description: Customer is not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    RideLocation:
+      type: object
+      properties:
+        pickupLocation:
+          type: string
+          description: Pickup location
+        destination:
+          type: string
+          description: Destination location
+      required:
+        - pickupLocation
+        - destination
+
+    RideLocationResponse:
+      type: object
+      properties:
+        pickupLocation:
+          type: string
+        destination:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
