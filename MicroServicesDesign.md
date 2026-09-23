@@ -1290,24 +1290,3 @@ Việc trao đổi dữ liệu giữa các Microservice được thực hiện t
 
 ---
 
-# KẾT LUẬN
-
-Hệ thống CAB được phân chia thành 7 Bounded Context theo Domain-Driven Design:
-
-1. Identity & Access
-2. Booking
-3. Driver Dispatch
-4. Trip Management
-5. Pricing & Payment
-6. Notification
-7. Operations & Reporting
-
-Mỗi Bounded Context được triển khai thành một Microservice độc lập.
-
-Kiến trúc sử dụng Database-per-Service giúp các Microservice độc lập về dữ liệu, có thể mở rộng riêng và giảm sự phụ thuộc giữa các thành phần.
-
-PostgreSQL được sử dụng cho các nghiệp vụ cần dữ liệu có cấu trúc, quan hệ và transaction mạnh như Identity, Booking, Trip, Payment và Operations.
-
-MongoDB được sử dụng cho Dispatch và Notification vì các dữ liệu này có cấu trúc linh hoạt và Dispatch cần hỗ trợ xử lý dữ liệu vị trí.
-
-Các Microservice giao tiếp thông qua REST API và Domain Event thay vì truy cập trực tiếp Database của nhau.
